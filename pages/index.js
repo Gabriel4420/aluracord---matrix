@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Box, Button, Text, TextField, Image } from '@skynexui/components'
 import appConfig from '../config.json'
+import { useRouter } from 'next/router'
 
-function GlobalStyle() {
+const GlobalStyle = () => {
   return (
     <style global jsx>{`
       * {
@@ -33,7 +34,7 @@ function GlobalStyle() {
   )
 }
 
-function Titulo(props) {
+const Titulo = (props) => {
   const Tag = props.tag || 'h1'
   return (
     <>
@@ -64,7 +65,7 @@ function Titulo(props) {
 
 export default function PaginaInicial() {
   const [username, setUsername] = useState('')
-
+  const router = useRouter()
   return (
     <>
       <GlobalStyle />
@@ -102,6 +103,11 @@ export default function PaginaInicial() {
           {/* Formulário */}
           <Box
             as="form"
+            onSubmit={(e) => {
+              e.preventDefault()
+              alert('alguem submeteu o form')
+              router.push('/chat')
+            }}
             styleSheet={{
               display: 'flex',
               flexDirection: 'column',
