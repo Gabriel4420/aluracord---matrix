@@ -3,6 +3,7 @@ import { Box, Button, Text, TextField, Image } from '@skynexui/components'
 import appConfig from '../config.json'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
+import Footer from '../src/components/templates/Footer'
 
 const Titulo = (props) => {
   const Tag = props.tag || 'h1'
@@ -33,6 +34,7 @@ export default function PaginaInicial() {
       <Box
         styleSheet={{
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           backgroundColor: appConfig.theme.colors.neutrals[800],
@@ -147,7 +149,7 @@ export default function PaginaInicial() {
                 username ? username : 'gabriel4420'
               }.png`}
             />
-            )
+
             <Text
               variant="body4"
               styleSheet={{
@@ -162,6 +164,7 @@ export default function PaginaInicial() {
           </Box>
           {/* Photo Area */}
         </Box>
+        <Footer />
       </Box>
     </>
   )

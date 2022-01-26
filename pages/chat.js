@@ -3,6 +3,7 @@ import { useState } from 'react'
 import appConfig from '../config.json'
 import Header from '../src/components/templates/Header'
 import Head from 'next/head'
+import Footer from '../src/components/templates/Footer'
 const MessageList = (props) => {
   return (
     <Box
@@ -202,6 +203,7 @@ const Chat = () => {
               />
             </Box>
           </Box>
+          <Footer />
         </Box>
       </Box>
     </>
