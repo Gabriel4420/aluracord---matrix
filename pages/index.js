@@ -2,37 +2,7 @@ import { useState } from 'react'
 import { Box, Button, Text, TextField, Image } from '@skynexui/components'
 import appConfig from '../config.json'
 import { useRouter } from 'next/router'
-
-const GlobalStyle = () => {
-  return (
-    <style global jsx>{`
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        list-style: none;
-      }
-      body {
-        font-family: 'Open Sans', sans-serif;
-      }
-      /* App fit Height */
-      html,
-      body,
-      #__next {
-        min-height: 100vh;
-        display: flex;
-        flex: 1;
-      }
-      #__next {
-        flex: 1;
-      }
-      #__next > * {
-        flex: 1;
-      }
-      /* ./App fit Height */
-    `}</style>
-  )
-}
+import Head from 'next/head'
 
 const Titulo = (props) => {
   const Tag = props.tag || 'h1'
@@ -50,25 +20,16 @@ const Titulo = (props) => {
   )
 }
 
-// Componente React
-// function HomePage() {
-//     // JSX
-//     return (
-//         <div>
-//             <GlobalStyle />
-//             <Titulo tag="h2">Boas vindas de volta!</Titulo>
-//             <h2>Discord - Alura Matrix</h2>
-//         </div>
-//     )
-// }
-// export default HomePage
-
 export default function PaginaInicial() {
   const [username, setUsername] = useState('')
   const router = useRouter()
   return (
     <>
-      <GlobalStyle />
+      <Head>
+        <title>AluraCord</title>
+        <meta name="description" content="Clone Discord" />
+        <link rel="icon" type="image" href="./assets/alura-logo.png" />
+      </Head>
       <Box
         styleSheet={{
           display: 'flex',
@@ -104,9 +65,14 @@ export default function PaginaInicial() {
           <Box
             as="form"
             onSubmit={(e) => {
-              e.preventDefault()
-              alert('alguem submeteu o form')
-              router.push('/chat')
+              if (username.length > 0) {
+                e.preventDefault()
+
+                localStorage.setItem('username', username)
+                router.push('/chat')
+              }
+              username.length === 0 && alert('preencha o input')
+              router.push('/')
             }}
             styleSheet={{
               display: 'flex',
@@ -181,6 +147,7 @@ export default function PaginaInicial() {
                 username ? username : 'gabriel4420'
               }.png`}
             />
+            )
             <Text
               variant="body4"
               styleSheet={{
