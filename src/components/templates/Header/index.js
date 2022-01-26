@@ -19,7 +19,8 @@ const Header = () => {
         }}
       >
         <Text variant="heading5">
-          Chat - Bem vindo {localStorage.getItem('username')}
+          Chat - Bem vindo{' '}
+          {typeof window !== 'undefined' && localStorage.getItem('username')}
         </Text>
         <Button
           variant="tertiary"

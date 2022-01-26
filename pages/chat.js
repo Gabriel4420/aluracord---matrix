@@ -48,7 +48,7 @@ const MessageList = (props) => {
                   borderRadius: '50%',
                   marginRight: '8px',
                 }}
-                src={`https://github.com/${localStorage.getItem(
+                src={`https://github.com/${typeof window !== 'undefined' && localStorage.getItem(
                   'username',
                 )}.png`}
               />
