@@ -72,9 +72,11 @@ export default function PaginaInicial() {
 
                 localStorage.setItem('username', username)
                 router.push('/chat')
-              }
+              }else{
               username.length === 0 && alert('preencha o input')
               router.push('/')
+              }
+              
             }}
             styleSheet={{
               display: 'flex',
