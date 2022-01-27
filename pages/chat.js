@@ -1,9 +1,11 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import appConfig from '../config.json'
 import Header from '../src/components/templates/Header'
 import Head from 'next/head'
 import Footer from '../src/components/templates/Footer'
+import { createClient } from '@supabase/supabase-js'
+
 const MessageList = (props) => {
   return (
     <Box
@@ -46,19 +48,18 @@ const MessageList = (props) => {
                   width: '50px',
                   height: '50px',
                   borderRadius: '50%',
-                  marginRight: '8px',
+                  marginRight: '15px',
                 }}
-                src={`https://github.com/${typeof window !== 'undefined' && localStorage.getItem(
-                  'username',
-                )}.png`}
+                src={`https://github.com/${message.from}.png`}
               />
               <Box
                 as="div"
                 styleSheet={{
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  justifyContent: 'flex-start',
+                  width: '100%',
                 }}
               >
                 <Text
@@ -75,7 +76,7 @@ const MessageList = (props) => {
                 <Text
                   styleSheet={{
                     fontSize: '12px',
-                    marginLeft: '-64px',
+
                     color: appConfig.theme.colors.neutrals[300],
                   }}
                   tag="span"
@@ -87,7 +88,7 @@ const MessageList = (props) => {
             <Box
               styleSheet={{
                 fontSize: '14px',
-                marginLeft: '58px',
+                marginLeft: '68px',
                 color: appConfig.theme.colors.neutrals[300],
               }}
             >
@@ -103,15 +104,39 @@ const MessageList = (props) => {
 const Chat = () => {
   const [message, setMessage] = useState('')
   const [listMessages, setListMessages] = useState([])
+  const SUPABASE_ANON_KEY =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzI5MzMxNSwiZXhwIjoxOTU4ODY5MzE1fQ.qVF8dQNIfD13wXLFg-n4AMN-XBO1Dsivf602NCQNH1M'
+  const SUPABASE_URL = 'https://jzqpsrmygmutdcissxay.supabase.co'
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+  useEffect(() => {
+    supabaseClient
+      .from('messages')
+      .select('*')
+      .order('id', { ascending: false })
+      .then(({ data }) => {
+        console.log('Dados da consulta:', data)
+        setListMessages(data)
+      })
+  }, [])
   const handleNewMessage = (newMessage) => {
     const message = {
-      id: listMessages.length + 1,
-      from: `@${localStorage.getItem('username')}`,
+      // id: listaDeMensagens.length + 1,
+      from: `${localStorage.getItem('username')}`,
       text: newMessage,
     }
 
-    setListMessages([message, ...listMessages])
+    supabaseClient
+      .from('messages')
+      .insert([
+        // Tem que ser um objeto com os MESMOS CAMPOS que você escreveu no supabase
+        message,
+      ])
+      .then(({ data }) => {
+        console.log('Creating Message: ', data)
+        setListMessages([data[0], ...listMessages])
+      })
+
     setMessage('')
   }
   return (
