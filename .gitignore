@@ -39,4 +39,4 @@ jspm_packages
 .next .cache
 .next .server
 .next .static
-.env
+next.config.js
