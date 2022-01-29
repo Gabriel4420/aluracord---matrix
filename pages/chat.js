@@ -1,113 +1,28 @@
-import { Box, Text, TextField, Image, Button } from '@skynexui/components'
+import { Box, TextField } from '@skynexui/components'
 import { useState, useEffect } from 'react'
+import MessageList from '../src/components/MessageList'
 import appConfig from '../config.json'
 import Header from '../src/components/templates/Header'
 import Head from 'next/head'
 import Footer from '../src/components/templates/Footer'
 import { createClient } from '@supabase/supabase-js'
-
-const MessageList = (props) => {
-  return (
-    <Box
-      tag="ul"
-      styleSheet={{
-        overflow: 'scroll',
-        overflowX: 'hidden',
-        display: 'flex',
-        flexDirection: 'column-reverse',
-        flex: 1,
-        color: appConfig.theme.colors.neutrals['000'],
-        marginBottom: '20px',
-      }}
-    >
-      {props.messages.map((message) => {
-        return (
-          <Text
-            key={message.id}
-            tag="li"
-            styleSheet={{
-              borderRadius: '5px',
-              padding: '6px',
-              marginBottom: '12px',
-              hover: {
-                backgroundColor: appConfig.theme.colors.neutrals[700],
-              },
-            }}
-          >
-            <Box
-              styleSheet={{
-                marginBottom: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: ' flex-start',
-                width: '100%',
-              }}
-            >
-              <Image
-                styleSheet={{
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '50%',
-                  marginRight: '15px',
-                }}
-                src={`https://github.com/${message.from}.png`}
-              />
-              <Box
-                as="div"
-                styleSheet={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  justifyContent: 'flex-start',
-                  width: '100%',
-                }}
-              >
-                <Text
-                  styleSheet={{
-                    marginBottom: '5px',
-                    width: '100%',
-                    fontSize: '20px',
-                    color: appConfig.theme.colors.neutrals[300],
-                  }}
-                  tag="strong"
-                >
-                  {message.from}
-                </Text>
-                <Text
-                  styleSheet={{
-                    fontSize: '12px',
-
-                    color: appConfig.theme.colors.neutrals[300],
-                  }}
-                  tag="span"
-                >
-                  {new Date().toLocaleDateString()}
-                </Text>
-              </Box>
-            </Box>
-            <Box
-              styleSheet={{
-                fontSize: '14px',
-                marginLeft: '68px',
-                color: appConfig.theme.colors.neutrals[300],
-              }}
-            >
-              {message.text}
-            </Box>
-          </Text>
-        )
-      })}
-    </Box>
-  )
+import { ButtonSendSticker } from '../src/components/buttonSendSticker'
+const supabaseClient = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY,
+)
+const listeningMessagesInRealTime = (addMessage) => {
+  return supabaseClient
+    .from('messages')
+    .on('INSERT', (answerLive) => {
+      setMessage(answerLive.new)
+    })
+    .subscribe()
 }
 
 const Chat = () => {
   const [message, setMessage] = useState('')
   const [listMessages, setListMessages] = useState([])
-  const SUPABASE_ANON_KEY =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzI5MzMxNSwiZXhwIjoxOTU4ODY5MzE1fQ.qVF8dQNIfD13wXLFg-n4AMN-XBO1Dsivf602NCQNH1M'
-  const SUPABASE_URL = 'https://jzqpsrmygmutdcissxay.supabase.co'
-  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
   useEffect(() => {
     supabaseClient
@@ -118,7 +33,28 @@ const Chat = () => {
         console.log('Dados da consulta:', data)
         setListMessages(data)
       })
+
+    const subscription = listeningMessagesInRealTime((newMessage) => {
+      console.log('Nova mensagem:', newMessage)
+      console.log('listaDeMensagens:', listMessages)
+      // Quero reusar um valor de referencia (objeto/array)
+      // Passar uma função pro setState
+
+      // setListaDeMensagens([
+      //     novaMensagem,
+      //     ...listaDeMensagens
+      // ])
+      setListMessages((ActualValue) => {
+        console.log('valorAtualDaLista:', ActualValue)
+        return [newMessage, ...ActualValue]
+      })
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
+
   const handleNewMessage = (newMessage) => {
     const message = {
       // id: listaDeMensagens.length + 1,
@@ -133,7 +69,6 @@ const Chat = () => {
         message,
       ])
       .then(({ data }) => {
-        console.log('Creating Message: ', data)
         setListMessages([data[0], ...listMessages])
       })
 
@@ -224,6 +159,12 @@ const Chat = () => {
                   backgroundColor: appConfig.theme.colors.neutrals[800],
                   marginRight: '12px',
                   color: appConfig.theme.colors.neutrals[200],
+                }}
+              />
+              <ButtonSendSticker
+                onStickerClick={(sticker) => {
+                  // console.log('[USANDO O COMPONENTE] Salva esse sticker no banco', sticker);
+                  handleNewMessage(':sticker: ' + sticker)
                 }}
               />
             </Box>
