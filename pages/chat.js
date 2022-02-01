@@ -31,7 +31,9 @@ const Chat = () => {
       .order('id', { ascending: false })
       .then(({ data }) => {
         console.log('Dados da consulta:', data)
+        
         setListMessages(data)
+        
       })
 
     const subscription = listeningMessagesInRealTime((newMessage) => {
@@ -53,7 +55,7 @@ const Chat = () => {
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+  }, [listMessages])
 
   const handleNewMessage = (newMessage) => {
     const message = {
@@ -70,6 +72,7 @@ const Chat = () => {
       ])
       .then(({ data }) => {
         setListMessages([data[0], ...listMessages])
+      
       })
 
     setMessage('')
